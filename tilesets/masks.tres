@@ -1,0 +1,22 @@
+[gd_resource type="TileSet" format=3 uid="uid://d2pwgtqaqekpi"]
+
+[ext_resource type="Texture2D" uid="uid://b6no1jw1e4uxg" path="res://sprites/masks.png" id="1_t2unu"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ga3qi"]
+texture = ExtResource("1_t2unu")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/next_alternative_id = 4
+5:1/0 = 0
+
+[resource]
+sources/0 = SubResource("TileSetAtlasSource_ga3qi")

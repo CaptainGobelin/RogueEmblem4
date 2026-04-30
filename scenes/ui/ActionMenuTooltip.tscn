@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://ric3lh8bvius"]
+
+[ext_resource type="PackedScene" uid="uid://c3esqfvgrlk70" path="res://scenes/ui/TooltipMenu.tscn" id="1_wieee"]
+[ext_resource type="Script" uid="uid://dsyrjeca1fo6i" path="res://scenes/ui/ActionMenuTooltip.gd" id="2_k6xca"]
+[ext_resource type="Theme" uid="uid://b2u2un3276cy" path="res://themes/uiTheme.tres" id="3_or5y8"]
+
+[node name="ActionMenuTooltip" unique_id=1164671532 instance=ExtResource("1_wieee")]
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+grow_horizontal = 1
+grow_vertical = 1
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("2_k6xca")
+
+[node name="Panel" type="Panel" parent="." index="0" unique_id=248049412]
+layout_mode = 0
+offset_right = 52.0
+offset_bottom = 60.0
+
+[node name="AttackButton" type="Button" parent="Panel" index="0" unique_id=138307167]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 48.0
+offset_bottom = 28.0
+theme = ExtResource("3_or5y8")
+text = "Attack"
+
+[node name="WaitButton" type="Button" parent="Panel" index="1" unique_id=1629259166]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 32.0
+offset_right = 48.0
+offset_bottom = 56.0
+theme = ExtResource("3_or5y8")
+text = "Wait"
+
+[connection signal="pressed" from="Panel/AttackButton" to="." method="_onAttackButtonPressed"]
+[connection signal="pressed" from="Panel/WaitButton" to="." method="_onWaitButtonPressed"]

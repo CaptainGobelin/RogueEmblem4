@@ -1,0 +1,31 @@
+[gd_scene format=4 uid="uid://baxq687vweybw"]
+
+[ext_resource type="Script" uid="uid://b0jdkxgrr3rlt" path="res://scenes/battle/BattleMap.gd" id="1_elcx0"]
+[ext_resource type="TileSet" uid="uid://d2pwgtqaqekpi" path="res://tilesets/masks.tres" id="2_elcx0"]
+[ext_resource type="Script" uid="uid://7ktfjmwl26t0" path="res://scenes/battle/TacticalQuery.gd" id="2_le66r"]
+[ext_resource type="TileSet" uid="uid://bqfbbsdy5qokg" path="res://tilesets/testMap.tres" id="3_58xiw"]
+[ext_resource type="Script" uid="uid://d0sxhipvsqqbc" path="res://scenes/battle/MapGenerator.gd" id="5_f2vqd"]
+
+[node name="BattleMap" type="Node2D" unique_id=1162840794]
+script = ExtResource("1_elcx0")
+
+[node name="MapGenerator" type="Node" parent="." unique_id=293308587]
+script = ExtResource("5_f2vqd")
+
+[node name="TacticalQuery" type="Node" parent="." unique_id=441666605]
+script = ExtResource("2_le66r")
+
+[node name="Terrain" type="TileMapLayer" parent="." unique_id=565572559]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAABAAAAAAAEAAAAAAABAAAAAAAEAAEAAAABAAAAAAADAAEAAAABAAAAAAACAAEAAAAAAAAAAAABAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAAAAAAAAAAABAAIAAAAAAAAAAAACAAIAAAAAAAAAAAADAAIAAAAAAAAAAAAEAAIAAAAAAAAAAAAEAAMAAAAAAAAAAAADAAMAAAAAAAAAAAACAAMAAAAAAAAAAAABAAMAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAQAAAAAAAAAAAABAAQAAAAAAAAAAAACAAQAAAAAAAAAAAADAAQAAAABAAAAAAAEAAQAAAABAAAAAAAAAAUAAAAAAAAAAAABAAUAAAAAAAAAAAACAAUAAAAAAAAAAAADAAUAAAAAAAAAAAAEAAUAAAAAAAAAAAAAAAYAAAAAAAAAAAABAAYAAAAAAAAAAAACAAYAAAAAAAAAAAADAAYAAAAAAAAAAAAEAAYAAAAAAAAAAAAHAAAAAAAAAAAAAAAHAAEAAAAAAAAAAAAHAAIAAAAAAAAAAAAHAAMAAAAAAAAAAAAHAAQAAAAAAAAAAAAHAAUAAAAAAAAAAAAHAAYAAAAAAAAAAAAGAAYAAAAAAAAAAAAFAAYAAAAAAAAAAAAFAAUAAAAAAAAAAAAGAAUAAAAAAAAAAAAGAAQAAAAAAAAAAAAFAAQAAAAAAAAAAAAFAAMAAAAAAAAAAAAFAAIAAAAAAAAAAAAGAAIAAAAAAAAAAAAGAAEAAAAAAAAAAAAGAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAFAAEAAAAAAAAAAAAGAAMAAAAAAAAAAAA=")
+tile_set = ExtResource("3_58xiw")
+occlusion_enabled = false
+collision_enabled = false
+navigation_enabled = false
+
+[node name="Mask" type="TileMapLayer" parent="." unique_id=581043483]
+tile_set = ExtResource("2_elcx0")
+
+[node name="Button" type="Button" parent="." unique_id=580033799]
+offset_right = 128.0
+offset_bottom = 112.0
+flat = true
