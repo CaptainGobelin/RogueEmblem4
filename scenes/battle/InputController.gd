@@ -64,7 +64,7 @@ func _input(event: InputEvent) -> void:
 				selectUnitMode()
 				return
 			InputState.INPUT_SELECT_ACTION:
-				Ref.map.moveUnit(selected_unit, selected_unit.previousPos)
+				Ref.map.placeUnit(selected_unit, selected_unit.previousPos)
 				Ref.ui.actionMenu.close()
 				battle_scene.askSelectUnit(selected_unit)
 				return
@@ -95,8 +95,8 @@ func _onCellClicked(cell : Vector2i) -> void:
 func _onAttackActionClicked() -> void:
 	state = InputState.INPUT_SELECT_TARGET
 	Ref.ui.actionMenu.close()
-	Ref.map.getUnitTargets(selected_unit)
-	Ref.map.drawReach()
+	Ref.map.computeAttackArea(selected_unit)
+	Ref.map.drawReach(true)
 
 func _onWaitActionClicked() -> void:
 	Ref.ui.actionMenu.close()

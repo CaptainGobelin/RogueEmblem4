@@ -29,9 +29,24 @@ var wallsPerQuadrant: Dictionary = {}
 # Public
 # ==============================================================================
 
-func computeTacticalAreas(unit: Unit) -> void:
+func computeMoveMap(unit: Unit) -> Dictionary[Vector2i, TacticalQuery.Path]:
+	var reach: Dictionary[Vector2i, Path] = {unit.pos: Path.new()}
+	var visited: Dictionary[Vector2i, Path] = {unit.pos: Path.new()}
+	var lastAdded: Array[Vector2i] = [unit.pos]
+	for i in range(unit.move):
+		var newAdded: Array[Vector2i] = []
+		for c in lastAdded:
+			for n in Data.neighbors:
+				if not visited.has(c + n) and get_parent().isCellPassable(unit, c + n):
+					if get_parent().isCellFree(unit, c + n):
+						reach[c + n] = visited[c].copy().add(c)
+					visited[c + n] = visited[c].copy().add(c)
+					newAdded.append(c + n)
+		lastAdded = newAdded
+	return reach
+
+func computeAttackMap(unit: Unit, reach: Array[Vector2i]) -> Dictionary[Vector2i, Vector2i]:
 	var origin = unit.position
-	var reach = _getReachableCells(unit)
 	var allWalls: Array[Vector2i] = Ref.map.terrain.get_used_cells_by_id(0, Vector2i(1, 0))
 	wallsPerQuadrant = _computeWallsPerQuadrant(origin, unit.atkRange[1], allWalls)
 	var attackMap: Dictionary[Vector2i, Vector2i] = {}
@@ -43,65 +58,11 @@ func computeTacticalAreas(unit: Unit) -> void:
 			if _isBlockedByWall(origin, target):
 				continue
 			attackMap[target] = r
-	get_parent().currentReach = reach
-	get_parent().attackMap = attackMap
-
-func getTargetableArea(unit: Unit) -> void:
-	var allWalls: Array[Vector2i] = Ref.map.terrain.get_used_cells_by_id(0, Vector2i(1, 0))
-	wallsPerQuadrant = _computeWallsPerQuadrant(unit.pos, unit.atkRange[1], allWalls)
-	var attackMap: Dictionary[Vector2i, Vector2i] = {}
-	for r in [unit.pos]:
-		for a in _getAtkRing(unit):
-			var target = r + a
-			if attackMap.has(target):
-				continue
-			if _isBlockedByWall(unit.pos, target):
-				continue
-			attackMap[target] = r
-	get_parent().currentReach.clear()
-	get_parent().attackMap = attackMap
-
-func getAttackableUnits(unit: Unit, cell: Vector2i) -> Array[Unit]:
-	var result: Array[Unit] = []
-	var allWalls: Array[Vector2i] = Ref.map.terrain.get_used_cells_by_id(0, Vector2i(1, 0))
-	wallsPerQuadrant = _computeWallsPerQuadrant(cell, unit.atkRange[1], allWalls)
-	var attackMap: Dictionary[Vector2i, Vector2i] = {}
-	for r in [cell]:
-		for a in _getAtkRing(unit):
-			var target = r + a
-			if attackMap.has(target):
-				continue
-			if _isBlockedByWall(cell, target):
-				continue
-			attackMap[target] = r
-	for a in attackMap.keys():
-		var target: Unit = Ref.map.getCellUnit(a)
-		if target == null or target == unit:
-			continue
-		if target.team == unit.team:
-			continue
-		result.append(target)
-	return result
+	return attackMap
 
 # ==============================================================================
 # Private
 # ==============================================================================
-
-func _getReachableCells(unit: Unit) -> Dictionary[Vector2i, Path]:
-	var result: Dictionary[Vector2i, Path] = {unit.pos: Path.new()}
-	var visited: Dictionary[Vector2i, Path] = {unit.pos: Path.new()}
-	var lastAdded: Array[Vector2i] = [unit.pos]
-	for i in range(unit.move):
-		var newAdded: Array[Vector2i] = []
-		for c in lastAdded:
-			for n in Data.neighbors:
-				if not visited.has(c + n) and get_parent().isCellPassable(unit, c + n):
-					if get_parent().isCellFree(unit, c + n):
-						result[c + n] = visited[c].copy().add(c)
-					visited[c + n] = visited[c].copy().add(c)
-					newAdded.append(c + n)
-		lastAdded = newAdded
-	return result
 
 func _getQuadrantDirection(origin: Vector2i, target: Vector2i) -> Quadrant:
 	if target.x >= origin.x:

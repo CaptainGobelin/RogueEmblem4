@@ -1,21 +1,7 @@
 extends Node
 class_name AIManager
 
-@onready var tilemap: TileMapLayer = $TileMapLayer
-
 var debugCells: Dictionary[Vector2i, Vector2] = {}
-
-func aiTurn(units: Node, map: BattleMap) -> void:
-	await performEnemyTurn()
-	#for e:Unit in units.get_children():
-		#if e.team == Unit.Team.ENEMY and not e.isDead:
-			#map.getUnitReach(e)
-			#for u:Unit in units.get_children():
-				#if u.team == Unit.Team.PLAYER:
-					#if map.attackMap.has(u.pos):
-						#e.moveTo(map.attackMap[u.pos])
-						#e.attack(u)
-						#break
 
 func performEnemyTurn() -> void:
 	var waitingEnemies: Array[Unit] = []
@@ -32,6 +18,7 @@ func performEnemyTurn() -> void:
 func executeEnemyRound(enemyUnits: Array[Unit]) -> bool:
 	var best_enemy: Unit = null
 	var best_cell: Vector2i = Vector2i(-1, -1)
+	var best_path: TacticalQuery.Path
 	var best_score: float = -INF
 	var selectedTarget: Unit = null
 	for enemy in enemyUnits:
@@ -50,7 +37,7 @@ func executeEnemyRound(enemyUnits: Array[Unit]) -> bool:
 				else:
 					pressure += getUnitPressureScore(unit, enemy)
 					danger += getUnitDangerScore(unit, enemy)
-			for target in getAllAttackableUnits(enemy, cell):
+			for target in Ref.map.getAttackableUnits(enemy, cell):
 				var bonus = getAttackBonus(enemy, target)
 				if bonus > attack_bonus:
 					localSelectedTarget = target
@@ -61,11 +48,12 @@ func executeEnemyRound(enemyUnits: Array[Unit]) -> bool:
 				best_score = score
 				best_enemy = enemy
 				best_cell = cell
+				best_path = reachable_cells[cell]
 				selectedTarget = localSelectedTarget
 		await drawDebug()
-		pass
 	if best_enemy == null:
 		return false
+	Ref.map.currentMoveMap = { best_cell: best_path }
 	Ref.map.moveUnit(best_enemy, best_cell)
 	if not selectedTarget == null:
 		best_enemy.attack(selectedTarget)
@@ -108,20 +96,16 @@ func getAllSurroundingUnits(unit: Unit, cell: Vector2i) -> Array[Unit]:
 			queue.append({"cell": current + n, "dist": dist + 1})
 	return result
 
-func getAllAttackableUnits(unit: Unit, cell: Vector2i) -> Array[Unit]:
-	return Ref.map.getAttackableUnits(unit, cell)
-
 func drawDebug():
 	var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
-	tilemap.clear()
 	for c in debugCells.keys():
-		#tilemap.set_cell(c, 0, Vector2(5, 1))
-		#var tiledata = tilemap.get_cell_tile_data(c)
 		img.set_pixelv(c, Color(
 			clamp(debugCells[c].y, 0.0, 1.0),
 			clamp(debugCells[c].x, 0.0, 1.0),
 			0.0,
 			0.55
 		))
-	$Sprite2D.texture.set_image(img)
+	$Heatmap.texture.set_image(img)
+	$Heatmap.visible = true
 	await get_tree().process_frame
+	$Heatmap.visible = false

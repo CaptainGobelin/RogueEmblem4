@@ -9,7 +9,7 @@ static var INVALID: Unit = null
 
 @onready var button: Button = $Button
 
-@export var team: Team = Team.PLAYER: 
+var team: Team = Team.PLAYER: 
 	set(value):
 		team = value
 		if team == Team.PLAYER:
@@ -58,7 +58,13 @@ func takeDamage(amount: int) -> void:
 	if hp <= 0:
 		isDead = true
 		print(name + " dies !")
+		Ref.map.occupiedCells.erase(pos)
 		queue_free()
+
+func placeTo(cell: Vector2i) -> void:
+	previousPos = cell
+	pos = cell
+	position = Data.CELL_SIZE * cell
 
 func moveTo(cell: Vector2i) -> void:
 	previousPos = pos

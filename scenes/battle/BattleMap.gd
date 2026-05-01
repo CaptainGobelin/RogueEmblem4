@@ -1,6 +1,8 @@
 extends Node2D
 class_name BattleMap
 
+enum CellStatus {BLOCKED, VISIBLE, PASSABLE, FREE}
+
 @onready var mapGenerator: MapGenerator = $MapGenerator
 @onready var terrain: TileMapLayer = $Terrain
 @onready var mask: TileMapLayer = $Mask
@@ -8,11 +10,11 @@ class_name BattleMap
 
 signal cell_clicked(cell : Vector2i)
 
-var occupiedCells: Dictionary[Unit, Vector2i] = {}
+var occupiedCells: Dictionary[Vector2i, Unit] = {}
 var player_deploy_cells: Array[Vector2i] = []
 var enemy_deploy_cells: Array[Vector2i] = []
-var currentReach: Dictionary[Vector2i, TacticalQuery.Path] = {}
-var attackMap: Dictionary[Vector2i, Vector2i] = {} # targetCell -> standCell
+var currentMoveMap: Dictionary[Vector2i, TacticalQuery.Path] = {}
+var currentAttackMap: Dictionary[Vector2i, Vector2i] = {} # targetCell -> standCell
 
 func _ready() -> void:
 	mapButton.pressed.connect(_onMapPressed)
@@ -27,61 +29,71 @@ func deployUnits() -> void:
 		Unit.spawnAIUnit(cell, Unit.Team.ENEMY)
 
 func placeUnit(unit: Unit, cell: Vector2i) -> void:
-	unit.moveTo(cell)
-	occupiedCells[unit] = cell
+	occupiedCells.erase(unit.pos)
+	unit.placeTo(cell)
+	occupiedCells[cell] = unit
 
 func moveUnit(unit: Unit, cell: Vector2i) -> void:
-	if not currentReach.has(cell):
+	if not currentMoveMap.has(cell):
 		return
+	occupiedCells.erase(unit.pos)
 	unit.moveTo(cell)
-	occupiedCells[unit] = cell
+	occupiedCells[cell] = unit
 
-func getUnitReach(unit: Unit):
-	$TacticalQuery.computeTacticalAreas(unit)
-	return currentReach
+func computeTacticalArea(unit: Unit) -> void:
+	currentMoveMap = $TacticalQuery.computeMoveMap(unit)
+	currentAttackMap = $TacticalQuery.computeAttackMap(unit, currentMoveMap.keys())
 
-func getUnitTargets(unit: Unit) -> void:
-	$TacticalQuery.getTargetableArea(unit)
+func computeAttackArea(unit: Unit) -> void:
+	currentAttackMap = $TacticalQuery.computeAttackMap(unit, [unit.pos])
 
-func getAttackableUnits(unit: Unit, cell: Vector2i):
-	return $TacticalQuery.getAttackableUnits(unit, cell)
+func getUnitReach(unit: Unit) -> Dictionary[Vector2i, TacticalQuery.Path]:
+	return $TacticalQuery.computeMoveMap(unit)
+
+func getAttackableUnits(unit: Unit, cell: Vector2i) -> Array[Unit]:
+	var result: Array[Unit] = []
+	var attackMap = $TacticalQuery.computeAttackMap(unit, [cell] as Array[Vector2i])
+	for a in attackMap.keys():
+		var target: Unit = Ref.map.getCellUnit(a)
+		if target == null or target == unit:
+			continue
+		if target.team == unit.team:
+			continue
+		result.append(target)
+	return result
 
 func clearMask():
 	mask.clear()
 
-func drawReach():
+func drawReach(ignoreMove: bool = false):
 	clearMask()
-	for a in attackMap.keys():
+	for a in currentAttackMap.keys():
 		mask.set_cell(a, 0, Vector2i(1, 0))
-	for c in currentReach.keys():
+	if ignoreMove:
+		return
+	for c in currentMoveMap.keys():
 		mask.set_cell(c, 0, Vector2i(3, 0))
 
 func isCellPassable(unit: Unit, cell: Vector2i) -> bool:
-	if terrain.get_cell_source_id(cell) == -1:
-		return false
-	if terrain.get_cell_atlas_coords(cell) == Vector2i(1, 0):
-		return false
-	var occupator = getCellUnit(cell)
-	if occupator != null and occupator != unit:
-		if occupator.team != unit.team:
-			return false
-	return true
+	return _getCellStatus(unit, cell) >= CellStatus.PASSABLE
 
 func isCellFree(unit: Unit, cell: Vector2i) -> bool:
-	if terrain.get_cell_source_id(cell) == -1:
-		return false
-	if terrain.get_cell_atlas_coords(cell) == Vector2i(1, 0):
-		return false
-	var occupator = getCellUnit(cell)
-	if occupator != null and occupator != unit:
-		return false
-	return true
+	return _getCellStatus(unit, cell) >= CellStatus.FREE
 
 func getCellUnit(cell: Vector2i) -> Unit:
-	for u in get_parent().units.get_children():
-		if u.pos == cell:
-			return u
-	return null
+	return occupiedCells.get(cell, Unit.INVALID)
+
+func _getCellStatus(unit: Unit, cell: Vector2i) -> CellStatus:
+	if terrain.get_cell_source_id(cell) == -1:
+		return CellStatus.BLOCKED
+	if terrain.get_cell_atlas_coords(cell) == Vector2i(1, 0):
+		return CellStatus.BLOCKED
+	var occupator = getCellUnit(cell)
+	if occupator == null or occupator == unit:
+		return CellStatus.FREE
+	if occupator.team != unit.team:
+		return CellStatus.BLOCKED
+	return CellStatus.PASSABLE
 
 func _onMapPressed() -> void:
 	var local_pos = get_local_mouse_position()

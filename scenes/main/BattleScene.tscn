@@ -6,7 +6,6 @@
 [ext_resource type="Script" uid="uid://dbpyljtimnu12" path="res://scenes/battle/BattleManager.gd" id="4_fcddo"]
 [ext_resource type="PackedScene" uid="uid://baxq687vweybw" path="res://scenes/battle/BattleMap.tscn" id="4_jfxil"]
 [ext_resource type="Script" uid="uid://hl6y1x10dgvm" path="res://scenes/main/AIManager.gd" id="5_fvois"]
-[ext_resource type="TileSet" uid="uid://d2pwgtqaqekpi" path="res://tilesets/masks.tres" id="6_aoncf"]
 [ext_resource type="Script" uid="uid://dhuwb717wxsx7" path="res://scenes/battle/BattleUI.gd" id="7_7nvqn"]
 [ext_resource type="PackedScene" uid="uid://ric3lh8bvius" path="res://scenes/ui/ActionMenuTooltip.tscn" id="7_t6f12"]
 
@@ -27,12 +26,7 @@ script = ExtResource("4_fcddo")
 [node name="AIManager" type="Node" parent="." unique_id=1499222743]
 script = ExtResource("5_fvois")
 
-[node name="TileMapLayer" type="TileMapLayer" parent="AIManager" unique_id=457483917]
-z_index = 100
-z_as_relative = false
-tile_set = ExtResource("6_aoncf")
-
-[node name="Sprite2D" type="Sprite2D" parent="AIManager" unique_id=512370952]
+[node name="Heatmap" type="Sprite2D" parent="AIManager" unique_id=512370952]
 scale = Vector2(16, 16)
 texture = SubResource("ImageTexture_aoncf")
 centered = false

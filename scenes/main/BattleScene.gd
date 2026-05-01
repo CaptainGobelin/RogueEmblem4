@@ -30,7 +30,7 @@ func initBattle() -> void:
 	turn_manager.startBattle()
 
 func askEnemyTurn() -> void:
-	await aiManager.aiTurn(units, map)
+	await aiManager.performEnemyTurn()
 	battle_manager.isBattleOver()
 	turn_manager.endTurn()
 
@@ -39,7 +39,7 @@ func askSelectUnit(unit : Unit) -> void:
 		return
 	if unit.has_acted:
 		return
-	map.getUnitReach(unit)
+	map.computeTacticalArea(unit)
 	map.drawReach()
 	input_controller.selectDestinationMode(unit)
 
