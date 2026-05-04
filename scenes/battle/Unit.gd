@@ -2,7 +2,9 @@ extends Node2D
 class_name Unit
 
 enum Team { PLAYER, ENEMY }
-signal clicked(unit)
+signal clicked(unit: Unit)
+signal died
+signal acted
 
 static var unitScene = preload("res://scenes/battle/Unit.tscn")
 static var INVALID: Unit = null
@@ -25,8 +27,8 @@ var aim: int = 80
 var def: int = 0
 var strength: int = 2
 var speed: int = 2
-var move: int = 3
-var atkRange: Vector2i = Vector2i(1, 1) # min, max
+var move: int = 4
+var atkRange: Vector2i = Vector2i(2, 2) # min, max
 var hp: int
 var isDead: bool = false
 var has_acted: bool = false:
@@ -34,6 +36,8 @@ var has_acted: bool = false:
 		has_acted = value
 		if has_acted:
 			$Body.modulate = Color.WEB_GRAY
+			if team == Team.PLAYER:
+				acted.emit()
 		else:
 			$Body.modulate = Color.WHITE
 
@@ -59,6 +63,8 @@ func takeDamage(amount: int) -> void:
 		isDead = true
 		print(name + " dies !")
 		Ref.map.occupiedCells.erase(pos)
+		died.emit()
+		get_parent().remove_child(self)
 		queue_free()
 
 func placeTo(cell: Vector2i) -> void:

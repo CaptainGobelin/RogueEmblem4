@@ -27,6 +27,7 @@ script = ExtResource("4_fcddo")
 script = ExtResource("5_fvois")
 
 [node name="Heatmap" type="Sprite2D" parent="AIManager" unique_id=512370952]
+visible = false
 scale = Vector2(16, 16)
 texture = SubResource("ImageTexture_aoncf")
 centered = false

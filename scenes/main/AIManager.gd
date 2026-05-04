@@ -35,7 +35,7 @@ func executeEnemyRound(enemyUnits: Array[Unit]) -> bool:
 				if unit.team == Unit.Team.ENEMY:
 					supportScore += 1.0
 				else:
-					pressure += getUnitPressureScore(unit, enemy)
+					pressure = max(pressure, getUnitPressureScore(unit, enemy))
 					danger += getUnitDangerScore(unit, enemy)
 			for target in Ref.map.getAttackableUnits(enemy, cell):
 				var bonus = getAttackBonus(enemy, target)
@@ -50,7 +50,8 @@ func executeEnemyRound(enemyUnits: Array[Unit]) -> bool:
 				best_cell = cell
 				best_path = reachable_cells[cell]
 				selectedTarget = localSelectedTarget
-		await drawDebug()
+		if Debug.debugAi:
+			await drawDebug()
 	if best_enemy == null:
 		return false
 	Ref.map.currentMoveMap = { best_cell: best_path }

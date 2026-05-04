@@ -45,7 +45,7 @@ func computeTacticalArea(unit: Unit) -> void:
 	currentAttackMap = $TacticalQuery.computeAttackMap(unit, currentMoveMap.keys())
 
 func computeAttackArea(unit: Unit) -> void:
-	currentAttackMap = $TacticalQuery.computeAttackMap(unit, [unit.pos])
+	currentAttackMap = $TacticalQuery.computeAttackMap(unit, [unit.pos] as Array[Vector2i])
 
 func getUnitReach(unit: Unit) -> Dictionary[Vector2i, TacticalQuery.Path]:
 	return $TacticalQuery.computeMoveMap(unit)

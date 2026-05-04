@@ -31,7 +31,6 @@ func initBattle() -> void:
 
 func askEnemyTurn() -> void:
 	await aiManager.performEnemyTurn()
-	battle_manager.isBattleOver()
 	turn_manager.endTurn()
 
 func askSelectUnit(unit : Unit) -> void:
@@ -51,15 +50,14 @@ func askApplyAction(unit: Unit, action: Data.actions) -> void:
 			askWait(unit)
 
 func askAttack(attacker: Unit, defender: Unit, noMove: bool = false) -> void:
-	if not map.attackMap.has(defender.pos):
+	if not map.currentAttackMap.has(defender.pos):
 		return
 	if defender.team != Unit.Team.ENEMY:
 		return
 	if not noMove:
-		map.moveUnit(attacker, map.attackMap[defender.pos])
+		map.moveUnit(attacker, map.currentAttackMap[defender.pos])
 	attacker.attack(defender)
 	input_controller.selectUnitMode()
-	end_player_turn_if_needed()
 
 func askMove(unit : Unit, cell : Vector2i) -> void:
 	if unit == null:
@@ -69,16 +67,17 @@ func askMove(unit : Unit, cell : Vector2i) -> void:
 
 func askWait(unit: Unit) -> void:
 	Ref.map.clearMask()
-	unit.has_acted = true
+	unit.wait()
 	input_controller.selectUnitMode()
-	end_player_turn_if_needed()
 
 func end_player_turn_if_needed() -> void:
 	for unit in units.get_children():
-		if unit is Unit and unit.team == Unit.Team.PLAYER and not unit.has_acted:
+		if unit.team == Unit.Team.PLAYER and not unit.has_acted:
 			return
-	turn_manager.endTurn()
+	turn_manager.call_deferred("endTurn")
 
 func _onUnitSpawned(unit: Unit) -> void:
 	input_controller.registerUnit(unit)
 	turn_manager.registerUnit(unit)
+	unit.died.connect(battle_manager.isBattleOver)
+	unit.acted.connect(end_player_turn_if_needed)

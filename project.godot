@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 Data="*uid://cxwpchv61f80i"
 Ref="*uid://b5e1knmpscjr6"
+Debug="*uid://bahc5b8fulhma"
 
 [display]
 
