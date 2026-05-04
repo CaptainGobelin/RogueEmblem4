@@ -1,8 +1,7 @@
 [gd_scene format=3 uid="uid://cgsxehskk4msw"]
 
 [ext_resource type="Script" uid="uid://5f6w4vmqeat1" path="res://scenes/main/BattleScene.gd" id="1_l62ja"]
-[ext_resource type="Script" uid="uid://cvbgxwucw4xsi" path="res://scenes/battle/InputController.gd" id="2_10dco"]
-[ext_resource type="Script" uid="uid://bcdtl1mg0tdr7" path="res://scenes/battle/TurnManager.gd" id="3_jfxil"]
+[ext_resource type="Script" uid="uid://cvbgxwucw4xsi" path="res://scenes/battle/InputManager.gd" id="2_10dco"]
 [ext_resource type="Script" uid="uid://dbpyljtimnu12" path="res://scenes/battle/BattleManager.gd" id="4_fcddo"]
 [ext_resource type="PackedScene" uid="uid://baxq687vweybw" path="res://scenes/battle/BattleMap.tscn" id="4_jfxil"]
 [ext_resource type="Script" uid="uid://hl6y1x10dgvm" path="res://scenes/main/AIManager.gd" id="5_fvois"]
@@ -14,11 +13,8 @@
 [node name="BattleScene" type="Node2D" unique_id=1131930280]
 script = ExtResource("1_l62ja")
 
-[node name="InputController" type="Node" parent="." unique_id=1326697315]
+[node name="InputManager" type="Node" parent="." unique_id=1326697315]
 script = ExtResource("2_10dco")
-
-[node name="TurnManager" type="Node" parent="." unique_id=1277314961]
-script = ExtResource("3_jfxil")
 
 [node name="BattleManager" type="Node" parent="." unique_id=933765675]
 script = ExtResource("4_fcddo")

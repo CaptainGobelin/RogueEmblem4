@@ -5,9 +5,8 @@ const unitScene = preload("res://scenes/battle/Unit.tscn")
 
 @onready var map : BattleMap = $BattleMap
 @onready var units : Node = $Units
-@onready var input_controller : InputController = $InputController
-@onready var turn_manager : TurnManager = $TurnManager
-@onready var battle_manager : BattleManager = $BattleManager
+@onready var inputManager : InputManager = $InputManager
+@onready var battleManager : BattleManager = $BattleManager
 @onready var aiManager: AIManager = $AIManager
 @onready var camera: Camera2D = $MainCamera
 @onready var ui: CanvasLayer = $UI
@@ -17,30 +16,29 @@ func _ready() -> void:
 	Ref.map = map
 	Ref.camera = camera
 	Ref.ui = ui
-	battle_manager.units = units
-	input_controller.battle_scene = self
-	input_controller.registerMap(map)
-	input_controller.registerTurnManager(turn_manager)
-	input_controller.registerUi(ui)
+	inputManager.battleScene = self
+	inputManager.registerMap(map)
+	inputManager.registerBattleManager(battleManager)
+	inputManager.registerUi(ui)
 	initBattle()
 
 func initBattle() -> void:
 	map.initMap()
 	map.deployUnits()
-	turn_manager.startBattle()
+	battleManager.startBattle()
 
 func askEnemyTurn() -> void:
 	await aiManager.performEnemyTurn()
-	turn_manager.endTurn()
+	battleManager.endTurn()
 
 func askSelectUnit(unit : Unit) -> void:
 	if unit.team != Unit.Team.PLAYER:
 		return
-	if unit.has_acted:
+	if unit.hasActed:
 		return
 	map.computeTacticalArea(unit)
 	map.drawReach()
-	input_controller.selectDestinationMode(unit)
+	inputManager.selectDestinationMode(unit)
 
 func askApplyAction(unit: Unit, action: Data.actions) -> void:
 	match action:
@@ -57,27 +55,27 @@ func askAttack(attacker: Unit, defender: Unit, noMove: bool = false) -> void:
 	if not noMove:
 		map.moveUnit(attacker, map.currentAttackMap[defender.pos])
 	attacker.attack(defender)
-	input_controller.selectUnitMode()
+	inputManager.selectUnitMode()
 
 func askMove(unit : Unit, cell : Vector2i) -> void:
 	if unit == null:
 		return
 	map.moveUnit(unit, cell)
-	input_controller.chooseActionMode()
+	inputManager.chooseActionMode()
 
 func askWait(unit: Unit) -> void:
 	Ref.map.clearMask()
 	unit.wait()
-	input_controller.selectUnitMode()
+	inputManager.selectUnitMode()
 
-func end_player_turn_if_needed() -> void:
+func checkEndPlayerTurn() -> void:
 	for unit in units.get_children():
-		if unit.team == Unit.Team.PLAYER and not unit.has_acted:
+		if unit.team == Unit.Team.PLAYER and not unit.hasActed:
 			return
-	turn_manager.call_deferred("endTurn")
+	battleManager.call_deferred("endTurn")
 
 func _onUnitSpawned(unit: Unit) -> void:
-	input_controller.registerUnit(unit)
-	turn_manager.registerUnit(unit)
-	unit.died.connect(battle_manager.isBattleOver)
-	unit.acted.connect(end_player_turn_if_needed)
+	inputManager.registerUnit(unit)
+	battleManager.registerUnit(unit)
+	unit.died.connect(battleManager.isBattleOver)
+	unit.acted.connect(checkEndPlayerTurn)

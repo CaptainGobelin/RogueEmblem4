@@ -31,10 +31,10 @@ var move: int = 4
 var atkRange: Vector2i = Vector2i(2, 2) # min, max
 var hp: int
 var isDead: bool = false
-var has_acted: bool = false:
+var hasActed: bool = false:
 	set(value):
-		has_acted = value
-		if has_acted:
+		hasActed = value
+		if hasActed:
 			$Body.modulate = Color.WEB_GRAY
 			if team == Team.PLAYER:
 				acted.emit()
@@ -50,12 +50,12 @@ func _ready() -> void:
 # ==============================================================================
 
 func wait() -> void:
-	has_acted = true
+	hasActed = true
 
 func attack(target: Unit) -> void:
 	print(name + " attacks " + target.name)
 	target.takeDamage(attack_power)
-	has_acted = true
+	hasActed = true
 
 func takeDamage(amount: int) -> void:
 	hp -= amount
@@ -100,5 +100,5 @@ static func spawnAIUnit(cell: Vector2i, t: Team) -> void:
 func _onPressed() -> void:
 	clicked.emit(self)
 
-func _onNewTurn(_turn: TurnManager.Turn) -> void:
-	has_acted = false
+func _onNewTurn(_turn: BattleManager.Turn) -> void:
+	hasActed = false

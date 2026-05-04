@@ -1,5 +1,5 @@
 extends Node
-class_name InputController
+class_name InputManager
 
 enum InputState {
 	INPUT_SELECT_UNIT,
@@ -9,20 +9,19 @@ enum InputState {
 	INPUT_LOCKED
 }
 
-@export var battle_scene : BattleScene
-
+var battleScene : BattleScene
 var state : InputState = InputState.INPUT_LOCKED
-var selected_unit : Unit = null
+var selectedUnit : Unit = null
 
 func registerUnit(unit: Unit) -> void:
 	unit.clicked.connect(_onUnitClicked)
 
 func registerMap(map: BattleMap) -> void:
-	map.cell_clicked.connect(_onCellClicked)
+	map.cellClicked.connect(_onCellClicked)
 
-func registerTurnManager(turnManager: TurnManager) -> void:
-	turnManager.turnStarted.connect(_onTurnStarted)
-	turnManager.turnEnded.connect(_onTurnEnded)
+func registerBattleManager(battleManager: BattleManager) -> void:
+	battleManager.turnStarted.connect(_onTurnStarted)
+	battleManager.turnEnded.connect(_onTurnEnded)
 
 func registerUi(ui: BattleUI) -> void:
 	ui.actionMenu.attackClicked.connect(_onAttackActionClicked)
@@ -34,21 +33,21 @@ func registerUi(ui: BattleUI) -> void:
 
 func lockInput() -> void:
 	state = InputState.INPUT_LOCKED
-	selected_unit = null
+	selectedUnit = null
 	Ref.map.clearMask()
 
 func selectUnitMode() -> void:
 	state = InputState.INPUT_SELECT_UNIT
-	selected_unit = null
+	selectedUnit = null
 	Ref.map.clearMask()
 
 func selectDestinationMode(unit : Unit) -> void:
-	selected_unit = unit
+	selectedUnit = unit
 	state = InputState.INPUT_SELECT_DESTINATION
 
 func chooseActionMode() -> void:
 	Ref.map.clearMask()
-	Ref.ui.actionMenu.open(selected_unit)
+	Ref.ui.actionMenu.open(selectedUnit)
 	state = InputState.INPUT_SELECT_ACTION
 
 # ==============================================================================
@@ -64,9 +63,9 @@ func _input(event: InputEvent) -> void:
 				selectUnitMode()
 				return
 			InputState.INPUT_SELECT_ACTION:
-				Ref.map.placeUnit(selected_unit, selected_unit.previousPos)
+				Ref.map.placeUnit(selectedUnit, selectedUnit.previousPos)
 				Ref.ui.actionMenu.close()
-				battle_scene.askSelectUnit(selected_unit)
+				battleScene.askSelectUnit(selectedUnit)
 				return
 			InputState.INPUT_SELECT_TARGET:
 				chooseActionMode()
@@ -75,40 +74,40 @@ func _input(event: InputEvent) -> void:
 func _onUnitClicked(unit : Unit) -> void:
 	match state:
 		InputState.INPUT_SELECT_UNIT:
-			battle_scene.askSelectUnit(unit)
+			battleScene.askSelectUnit(unit)
 			return
 		InputState.INPUT_SELECT_DESTINATION:
-			if unit == selected_unit:
-				battle_scene.askMove(unit, unit.pos)
+			if unit == selectedUnit:
+				battleScene.askMove(unit, unit.pos)
 				return
-			battle_scene.askAttack(selected_unit, unit)
+			battleScene.askAttack(selectedUnit, unit)
 			return
 		InputState.INPUT_SELECT_TARGET:
-			battle_scene.askAttack(selected_unit, unit, true)
+			battleScene.askAttack(selectedUnit, unit, true)
 			return
 
 func _onCellClicked(cell : Vector2i) -> void:
 	if state != InputState.INPUT_SELECT_DESTINATION:
 		return
-	battle_scene.askMove(selected_unit, cell)
+	battleScene.askMove(selectedUnit, cell)
 
 func _onAttackActionClicked() -> void:
 	state = InputState.INPUT_SELECT_TARGET
 	Ref.ui.actionMenu.close()
-	Ref.map.computeAttackArea(selected_unit)
+	Ref.map.computeAttackArea(selectedUnit)
 	Ref.map.drawReach(true)
 
 func _onWaitActionClicked() -> void:
 	Ref.ui.actionMenu.close()
-	battle_scene.askWait(selected_unit)
+	battleScene.askWait(selectedUnit)
 
-func _onTurnStarted(turn: TurnManager.Turn) -> void:
-	if turn == TurnManager.Turn.PLAYER:
+func _onTurnStarted(turn: BattleManager.Turn) -> void:
+	if turn == BattleManager.Turn.PLAYER:
 		set_process_input(true)
 		selectUnitMode()
-	elif turn == TurnManager.Turn.ENEMY:
-		battle_scene.askEnemyTurn()
+	elif turn == BattleManager.Turn.ENEMY:
+		battleScene.askEnemyTurn()
 
-func _onTurnEnded(turn: TurnManager.Turn) -> void:
-	if turn == TurnManager.Turn.PLAYER:
+func _onTurnEnded(turn: BattleManager.Turn) -> void:
+	if turn == BattleManager.Turn.PLAYER:
 		lockInput()

@@ -6,7 +6,7 @@ var debugCells: Dictionary[Vector2i, Vector2] = {}
 func performEnemyTurn() -> void:
 	var waitingEnemies: Array[Unit] = []
 	for u in Ref.units.get_children():
-		if not u.has_acted and u.team == Unit.Team.ENEMY:
+		if not u.hasActed and u.team == Unit.Team.ENEMY:
 			waitingEnemies.append(u)
 	if waitingEnemies.is_empty():
 		return

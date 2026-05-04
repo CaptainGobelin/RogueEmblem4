@@ -8,7 +8,7 @@ enum CellStatus {BLOCKED, VISIBLE, PASSABLE, FREE}
 @onready var mask: TileMapLayer = $Mask
 @onready var mapButton: Button = $Button
 
-signal cell_clicked(cell : Vector2i)
+signal cellClicked(cell : Vector2i)
 
 var occupiedCells: Dictionary[Vector2i, Unit] = {}
 var player_deploy_cells: Array[Vector2i] = []
@@ -96,6 +96,6 @@ func _getCellStatus(unit: Unit, cell: Vector2i) -> CellStatus:
 	return CellStatus.PASSABLE
 
 func _onMapPressed() -> void:
-	var local_pos = get_local_mouse_position()
-	var cell = terrain.local_to_map(local_pos)
-	cell_clicked.emit(cell)
+	var localPos = get_local_mouse_position()
+	var cell = terrain.local_to_map(localPos)
+	cellClicked.emit(cell)
