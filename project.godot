@@ -21,6 +21,11 @@ Data="*uid://cxwpchv61f80i"
 Ref="*uid://b5e1knmpscjr6"
 Debug="*uid://bahc5b8fulhma"
 
+[debug]
+
+gdscript/warnings/redundant_await=0
+gdscript/warnings/missing_await=1
+
 [display]
 
 window/size/viewport_width=768

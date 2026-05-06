@@ -62,6 +62,14 @@ func getAttackableUnits(unit: Unit, cell: Vector2i) -> Array[Unit]:
 		result.append(target)
 	return result
 
+func getNearbyUnits(cell: Vector2i, team: Unit.Team, areaRange: int) -> Array[Unit]:
+	var result: Array[Unit] = []
+	for c in $TacticalQuery.getNearbyArea(cell, areaRange):
+		var unit = getCellUnit(c)
+		if unit != Unit.INVALID and unit.team == team:
+			result.append(unit)
+	return result
+
 func clearMask():
 	mask.clear()
 
@@ -88,6 +96,8 @@ func _getCellStatus(unit: Unit, cell: Vector2i) -> CellStatus:
 		return CellStatus.BLOCKED
 	if terrain.get_cell_atlas_coords(cell) == Vector2i(1, 0):
 		return CellStatus.BLOCKED
+	if unit == Unit.INVALID:
+		return CellStatus.FREE
 	var occupator = getCellUnit(cell)
 	if occupator == null or occupator == unit:
 		return CellStatus.FREE

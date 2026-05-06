@@ -60,6 +60,22 @@ func computeAttackMap(unit: Unit, reach: Array[Vector2i]) -> Dictionary[Vector2i
 			attackMap[target] = r
 	return attackMap
 
+func getNearbyArea(cell: Vector2i, areaRange: int) -> Array[Vector2i]:
+	var reach: Array[Vector2i] = [cell]
+	var visited: Array[Vector2i] = [cell]
+	var lastAdded: Array[Vector2i] = [cell]
+	for i in range(areaRange):
+		var newAdded: Array[Vector2i] = []
+		for c in lastAdded:
+			for n in Data.neighbors:
+				if not visited.has(c + n) and get_parent().isCellPassable(Unit.INVALID, c + n):
+					if get_parent().isCellFree(Unit.INVALID, c + n):
+						reach.append(c + n)
+					visited.append(c + n)
+					newAdded.append(c + n)
+		lastAdded = newAdded
+	return reach
+
 # ==============================================================================
 # Private
 # ==============================================================================

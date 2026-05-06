@@ -106,7 +106,7 @@ func _onTurnStarted(turn: BattleManager.Turn) -> void:
 		set_process_input(true)
 		selectUnitMode()
 	elif turn == BattleManager.Turn.ENEMY:
-		battleScene.askEnemyTurn()
+		await battleScene.askEnemyTurn()
 
 func _onTurnEnded(turn: BattleManager.Turn) -> void:
 	if turn == BattleManager.Turn.PLAYER:
