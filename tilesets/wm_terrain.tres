@@ -1,0 +1,64 @@
+[gd_resource type="TileSet" format=3 uid="uid://cvvcdjwawkpq6"]
+
+[ext_resource type="Texture2D" uid="uid://dx0tabjryvdsg" path="res://sprites/worldmap/terrain.png" id="1_8amyf"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wmi0p"]
+texture = ExtResource("1_8amyf")
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 0
+0:0/0/terrains_peering_bit/right_side = 0
+0:0/0/terrains_peering_bit/bottom_side = 0
+0:0/0/terrains_peering_bit/left_side = 0
+0:0/0/terrains_peering_bit/top_side = 0
+1:0/0 = 0
+1:0/0/terrain_set = 0
+1:0/0/terrain = 1
+1:0/0/terrains_peering_bit/right_side = 1
+1:0/0/terrains_peering_bit/bottom_side = 1
+1:0/0/terrains_peering_bit/left_side = 1
+1:0/0/terrains_peering_bit/top_side = 1
+2:0/0 = 0
+2:0/0/terrain_set = 0
+2:0/0/terrain = 2
+2:0/0/terrains_peering_bit/right_side = 2
+2:0/0/terrains_peering_bit/bottom_side = 2
+2:0/0/terrains_peering_bit/left_side = 2
+2:0/0/terrains_peering_bit/top_side = 2
+3:0/0 = 0
+3:0/0/terrain_set = 0
+3:0/0/terrain = 3
+3:0/0/terrains_peering_bit/right_side = 3
+3:0/0/terrains_peering_bit/bottom_side = 3
+3:0/0/terrains_peering_bit/left_side = 3
+3:0/0/terrains_peering_bit/top_side = 3
+4:0/0 = 0
+4:0/0/terrain_set = 0
+4:0/0/terrain = 4
+4:0/0/terrains_peering_bit/right_side = 4
+4:0/0/terrains_peering_bit/bottom_side = 4
+4:0/0/terrains_peering_bit/left_side = 4
+4:0/0/terrains_peering_bit/top_side = 4
+5:0/0 = 0
+5:0/0/terrain_set = 0
+5:0/0/terrain = 5
+5:0/0/terrains_peering_bit/right_side = 5
+5:0/0/terrains_peering_bit/bottom_side = 5
+5:0/0/terrains_peering_bit/left_side = 5
+5:0/0/terrains_peering_bit/top_side = 5
+
+[resource]
+terrain_set_0/mode = 2
+terrain_set_0/terrain_0/name = "water"
+terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
+terrain_set_0/terrain_1/name = "ground"
+terrain_set_0/terrain_1/color = Color(0.5, 0.4375, 0.25, 1)
+terrain_set_0/terrain_2/name = "rock"
+terrain_set_0/terrain_2/color = Color(0.46875, 0.5, 0.25, 1)
+terrain_set_0/terrain_3/name = "snow"
+terrain_set_0/terrain_3/color = Color(0.375, 0.5, 0.25, 1)
+terrain_set_0/terrain_4/name = "marsh"
+terrain_set_0/terrain_4/color = Color(0.28125, 0.5, 0.25, 1)
+terrain_set_0/terrain_5/name = "mountain"
+terrain_set_0/terrain_5/color = Color(0.25, 0.5, 0.3125, 1)
+sources/0 = SubResource("TileSetAtlasSource_wmi0p")

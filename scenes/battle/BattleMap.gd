@@ -15,18 +15,13 @@ var player_deploy_cells: Array[Vector2i] = []
 var enemy_deploy_cells: Array[Vector2i] = []
 var currentMoveMap: Dictionary[Vector2i, TacticalQuery.Path] = {}
 var currentAttackMap: Dictionary[Vector2i, Vector2i] = {} # targetCell -> standCell
+var enemyTeam: Dictionary = {}
 
 func _ready() -> void:
 	mapButton.pressed.connect(_onMapPressed)
 
 func initMap() -> void:
 	mapGenerator.initTestMap(self)
-
-func deployUnits() -> void:
-	for cell in player_deploy_cells:
-		Unit.spawnPlayerUnit(cell)
-	for cell in enemy_deploy_cells:
-		Unit.spawnAIUnit(cell, Unit.Team.ENEMY)
 
 func placeUnit(unit: Unit, cell: Vector2i) -> void:
 	occupiedCells.erase(unit.pos)
@@ -109,3 +104,16 @@ func _onMapPressed() -> void:
 	var localPos = get_local_mouse_position()
 	var cell = terrain.local_to_map(localPos)
 	cellClicked.emit(cell)
+
+func createDemoMap() -> void:
+	mapGenerator.initTestMap(self)
+	for cell in enemy_deploy_cells:
+		var unit = UnitManager.new(UnitManager.Team.ENEMY, Data.Monsters.GOBLIN, 0)
+		enemyTeam[unit.id] = unit
+		Unit.spawnAIUnit(unit, cell)
+
+func deployPlayerTeam(units: Array[UnitManager]) -> void:
+	for unit in units:
+		var pos: Vector2i = Utils.chooseRandom(player_deploy_cells)
+		Unit.spawnPlayerUnit(unit, pos)
+		player_deploy_cells.erase(pos)

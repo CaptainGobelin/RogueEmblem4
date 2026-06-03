@@ -81,15 +81,15 @@ func moveTo(cell: Vector2i) -> void:
 # Statics
 # ==============================================================================
 
-static func spawnPlayerUnit(cell: Vector2i) -> void:
+static func spawnPlayerUnit(entity: UnitManager, cell: Vector2i) -> void:
 	var unit := unitScene.instantiate()
 	unit.team = Team.PLAYER
 	Ref.map.placeUnit(unit, cell)
 	Ref.units.add_child(unit)
 
-static func spawnAIUnit(cell: Vector2i, t: Team) -> void:
+static func spawnAIUnit(entity: UnitManager, cell: Vector2i) -> void:
 	var unit := unitScene.instantiate()
-	unit.team = t
+	unit.team = Team.ENEMY
 	Ref.map.placeUnit(unit, cell)
 	Ref.units.add_child(unit)
 

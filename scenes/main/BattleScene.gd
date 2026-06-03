@@ -24,7 +24,6 @@ func _ready() -> void:
 
 func initBattle() -> void:
 	map.initMap()
-	map.deployUnits()
 	battleManager.startBattle()
 
 func askEnemyTurn() -> void:

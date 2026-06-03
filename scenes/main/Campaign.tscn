@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bu0v561uqpbpy"]
+
+[ext_resource type="Script" uid="uid://hk8dsce3l0tq" path="res://scenes/main/Campaign.gd" id="1_g16cn"]
+
+[node name="Campaign" type="Node" unique_id=429152443]
+script = ExtResource("1_g16cn")
+
+[node name="CurrentScene" type="Node" parent="." unique_id=12133876]

@@ -17,9 +17,11 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+Utils="*uid://fgskowjs06ly"
 Data="*uid://cxwpchv61f80i"
 Ref="*uid://b5e1knmpscjr6"
 Debug="*uid://bahc5b8fulhma"
+Global="*uid://dptmafl6ig63l"
 
 [debug]
 
