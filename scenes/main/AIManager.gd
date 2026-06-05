@@ -12,10 +12,10 @@ const SUPPORT_RANGE = 3
 var debugCells: Dictionary[Vector2i, Vector2] = {}
 
 func performEnemyTurn() -> void:
-	var activated: Array[Unit] = []
+	var activated: Array[UnitPawn] = []
 	var threatCells: Dictionary = _computeThreatCells() # Vector2i -> [[Enemies], [Allies]]
 	for e in Ref.units.get_children():
-		if e.hasActed or e.team != Unit.Team.ENEMY:
+		if e.hasActed or e.team != UnitPawn.Team.ENEMY:
 			continue
 		if _isThreatened(e, threatCells):
 			activated.append(e)
@@ -23,7 +23,7 @@ func performEnemyTurn() -> void:
 		if activated.is_empty():
 			return
 		var bestScore: float = 0.0
-		var bestUnit: Unit = null
+		var bestUnit: UnitPawn = null
 		var bestCell: Vector2i = Vector2i(-1, -1)
 		for e in activated:
 			var reach = Ref.map.getUnitReach(e)
@@ -39,7 +39,7 @@ func performEnemyTurn() -> void:
 			return
 		_activateNearbyAllies(bestUnit, activated)
 		await Ref.map.moveUnit(bestUnit, bestCell)
-		var target: Unit = _getBestTarget(bestUnit, bestUnit.pos)
+		var target: UnitPawn = _getBestTarget(bestUnit, bestUnit.pos)
 		if target != null:
 			await bestUnit.attack(target)
 		else:
@@ -50,7 +50,7 @@ func performEnemyTurn() -> void:
 func _computeThreatCells() -> Dictionary:
 	var result: Dictionary = {}
 	for u in Ref.units.get_children():
-		if u.team == Unit.Team.ENEMY:
+		if u.team == UnitPawn.Team.ENEMY:
 			continue
 		var threatCell = _getUnitThreat(u)
 		for c in threatCell:
@@ -60,11 +60,11 @@ func _computeThreatCells() -> Dictionary:
 				result[c] = [[u], []]
 	return result
 
-func _isThreatened(unit: Unit, threatCells: Dictionary) -> bool:
+func _isThreatened(unit: UnitPawn, threatCells: Dictionary) -> bool:
 	return threatCells.has(unit.pos)
 
-func _getBestTarget(unit: Unit, cell: Vector2i) -> Unit:
-	var result: Unit = Unit.INVALID
+func _getBestTarget(unit: UnitPawn, cell: Vector2i) -> UnitPawn:
+	var result: UnitPawn = UnitPawn.INVALID
 	var bestScore := 0.0
 	for t in Ref.map.getAttackableUnits(unit, cell):
 		var score := _getUnitPressureScore(t, unit)
@@ -72,18 +72,18 @@ func _getBestTarget(unit: Unit, cell: Vector2i) -> Unit:
 			result = t
 	return result
 
-func _activateNearbyAllies(unit: Unit, activated: Array[Unit]) -> void:
+func _activateNearbyAllies(unit: UnitPawn, activated: Array[UnitPawn]) -> void:
 	for a in Ref.map.getNearbyUnits(unit.pos, unit.team, SUPPORT_RANGE):
 		if a.hasActed or activated.has(a):
 			continue
 		activated.append(a)
 
-func _propagateSupport(unit: Unit, threatCells: Dictionary):
+func _propagateSupport(unit: UnitPawn, threatCells: Dictionary):
 	for c in _getUnitThreat(unit):
 		if threatCells.has(c):
 			threatCells[c][1].append(unit)
 	
-func _getUnitThreat(unit: Unit) -> Array[Vector2i]:
+func _getUnitThreat(unit: UnitPawn) -> Array[Vector2i]:
 	var visited: Array[Vector2i] = []
 	var queue = [{"cell": unit.pos, "dist": 0}]
 	while not queue.is_empty():
@@ -99,7 +99,7 @@ func _getUnitThreat(unit: Unit) -> Array[Vector2i]:
 			queue.append({"cell": current + n, "dist": dist + 1})
 	return visited
 
-func _getCellScore(unit: Unit, cell: Vector2i, threatCells: Dictionary) -> float:
+func _getCellScore(unit: UnitPawn, cell: Vector2i, threatCells: Dictionary) -> float:
 	if not threatCells.has(cell):
 		return 0.0
 	var pressure := 0.0
@@ -116,15 +116,15 @@ func _getCellScore(unit: Unit, cell: Vector2i, threatCells: Dictionary) -> float
 		debugCells[cell] = Vector2(pressure + atkBonus, danger / support)
 	return pressure + atkBonus - (danger / support)
 	
-func _getUnitDangerScore(attacker: Unit, defender: Unit) -> float:
+func _getUnitDangerScore(attacker: UnitPawn, defender: UnitPawn) -> float:
 	var damages := _getExpectedDamage(attacker, defender)
 	return clamp(damages / ENEMY_POWER_RATIO, 0.4, 1.0)
 
-func _getUnitPressureScore(target: Unit, attacker: Unit) -> float:
+func _getUnitPressureScore(target: UnitPawn, attacker: UnitPawn) -> float:
 	var damages := _getExpectedDamage(attacker, target)
 	return clamp(damages * ENEMY_POWER_RATIO, 0.4, 1.0)
 
-func _getExpectedDamage(attacker: Unit, defender: Unit) -> float:
+func _getExpectedDamage(attacker: UnitPawn, defender: UnitPawn) -> float:
 	var hitChance: float = float(attacker.aim - defender.def) / 100.0
 	hitChance = clamp(hitChance, 0.10, 0.95)
 	var dmgProportion: float = float(attacker.strength) / float(defender.maxHp)

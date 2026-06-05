@@ -1,8 +1,6 @@
 extends Node2D
 class_name BattleScene
 
-const unitScene = preload("res://scenes/battle/Unit.tscn")
-
 @onready var map : BattleMap = $BattleMap
 @onready var units : Node = $Units
 @onready var inputManager : InputManager = $InputManager
@@ -30,8 +28,8 @@ func askEnemyTurn() -> void:
 	await aiManager.performEnemyTurn()
 	battleManager.endTurn()
 
-func askSelectUnit(unit : Unit) -> void:
-	if unit.team != Unit.Team.PLAYER:
+func askSelectUnit(unit : UnitPawn) -> void:
+	if unit.team != UnitPawn.Team.PLAYER:
 		return
 	if unit.hasActed:
 		return
@@ -39,41 +37,41 @@ func askSelectUnit(unit : Unit) -> void:
 	map.drawReach()
 	inputManager.selectDestinationMode(unit)
 
-func askApplyAction(unit: Unit, action: Data.actions) -> void:
+func askApplyAction(unit: UnitPawn, action: Data.actions) -> void:
 	match action:
 		Data.actions.ATTACK:
 			pass
 		Data.actions.WAIT:
 			askWait(unit)
 
-func askAttack(attacker: Unit, defender: Unit, noMove: bool = false) -> void:
+func askAttack(attacker: UnitPawn, defender: UnitPawn, noMove: bool = false) -> void:
 	if not map.currentAttackMap.has(defender.pos):
 		return
-	if defender.team != Unit.Team.ENEMY:
+	if defender.team != UnitPawn.Team.ENEMY:
 		return
 	if not noMove:
 		map.moveUnit(attacker, map.currentAttackMap[defender.pos])
 	attacker.attack(defender)
 	inputManager.selectUnitMode()
 
-func askMove(unit : Unit, cell : Vector2i) -> void:
+func askMove(unit : UnitPawn, cell : Vector2i) -> void:
 	if unit == null:
 		return
 	map.moveUnit(unit, cell)
 	inputManager.chooseActionMode()
 
-func askWait(unit: Unit) -> void:
+func askWait(unit: UnitPawn) -> void:
 	Ref.map.clearMask()
 	unit.wait()
 	inputManager.selectUnitMode()
 
 func checkEndPlayerTurn() -> void:
 	for unit in units.get_children():
-		if unit.team == Unit.Team.PLAYER and not unit.hasActed:
+		if unit.team == UnitPawn.Team.PLAYER and not unit.hasActed:
 			return
 	battleManager.call_deferred("endTurn")
 
-func _onUnitSpawned(unit: Unit) -> void:
+func _onUnitSpawned(unit: UnitPawn) -> void:
 	inputManager.registerUnit(unit)
 	battleManager.registerUnit(unit)
 	unit.died.connect(battleManager.isBattleOver)

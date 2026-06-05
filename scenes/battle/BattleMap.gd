@@ -10,7 +10,7 @@ enum CellStatus {BLOCKED, VISIBLE, PASSABLE, FREE}
 
 signal cellClicked(cell : Vector2i)
 
-var occupiedCells: Dictionary[Vector2i, Unit] = {}
+var occupiedCells: Dictionary[Vector2i, UnitPawn] = {}
 var player_deploy_cells: Array[Vector2i] = []
 var enemy_deploy_cells: Array[Vector2i] = []
 var currentMoveMap: Dictionary[Vector2i, TacticalQuery.Path] = {}
@@ -23,33 +23,33 @@ func _ready() -> void:
 func initMap() -> void:
 	mapGenerator.initTestMap(self)
 
-func placeUnit(unit: Unit, cell: Vector2i) -> void:
+func placeUnit(unit: UnitPawn, cell: Vector2i) -> void:
 	occupiedCells.erase(unit.pos)
 	unit.placeTo(cell)
 	occupiedCells[cell] = unit
 
-func moveUnit(unit: Unit, cell: Vector2i) -> void:
+func moveUnit(unit: UnitPawn, cell: Vector2i) -> void:
 	if not currentMoveMap.has(cell):
 		return
 	occupiedCells.erase(unit.pos)
 	unit.moveTo(cell)
 	occupiedCells[cell] = unit
 
-func computeTacticalArea(unit: Unit) -> void:
+func computeTacticalArea(unit: UnitPawn) -> void:
 	currentMoveMap = $TacticalQuery.computeMoveMap(unit)
 	currentAttackMap = $TacticalQuery.computeAttackMap(unit, currentMoveMap.keys())
 
-func computeAttackArea(unit: Unit) -> void:
+func computeAttackArea(unit: UnitPawn) -> void:
 	currentAttackMap = $TacticalQuery.computeAttackMap(unit, [unit.pos] as Array[Vector2i])
 
-func getUnitReach(unit: Unit) -> Dictionary[Vector2i, TacticalQuery.Path]:
+func getUnitReach(unit: UnitPawn) -> Dictionary[Vector2i, TacticalQuery.Path]:
 	return $TacticalQuery.computeMoveMap(unit)
 
-func getAttackableUnits(unit: Unit, cell: Vector2i) -> Array[Unit]:
-	var result: Array[Unit] = []
+func getAttackableUnits(unit: UnitPawn, cell: Vector2i) -> Array[UnitPawn]:
+	var result: Array[UnitPawn] = []
 	var attackMap = $TacticalQuery.computeAttackMap(unit, [cell] as Array[Vector2i])
 	for a in attackMap.keys():
-		var target: Unit = Ref.map.getCellUnit(a)
+		var target: UnitPawn = Ref.map.getCellUnit(a)
 		if target == null or target == unit:
 			continue
 		if target.team == unit.team:
@@ -57,11 +57,11 @@ func getAttackableUnits(unit: Unit, cell: Vector2i) -> Array[Unit]:
 		result.append(target)
 	return result
 
-func getNearbyUnits(cell: Vector2i, team: Unit.Team, areaRange: int) -> Array[Unit]:
-	var result: Array[Unit] = []
+func getNearbyUnits(cell: Vector2i, team: UnitPawn.Team, areaRange: int) -> Array[UnitPawn]:
+	var result: Array[UnitPawn] = []
 	for c in $TacticalQuery.getNearbyArea(cell, areaRange):
 		var unit = getCellUnit(c)
-		if unit != Unit.INVALID and unit.team == team:
+		if unit != UnitPawn.INVALID and unit.team == team:
 			result.append(unit)
 	return result
 
@@ -77,21 +77,21 @@ func drawReach(ignoreMove: bool = false):
 	for c in currentMoveMap.keys():
 		mask.set_cell(c, 0, Vector2i(3, 0))
 
-func isCellPassable(unit: Unit, cell: Vector2i) -> bool:
+func isCellPassable(unit: UnitPawn, cell: Vector2i) -> bool:
 	return _getCellStatus(unit, cell) >= CellStatus.PASSABLE
 
-func isCellFree(unit: Unit, cell: Vector2i) -> bool:
+func isCellFree(unit: UnitPawn, cell: Vector2i) -> bool:
 	return _getCellStatus(unit, cell) >= CellStatus.FREE
 
-func getCellUnit(cell: Vector2i) -> Unit:
-	return occupiedCells.get(cell, Unit.INVALID)
+func getCellUnit(cell: Vector2i) -> UnitPawn:
+	return occupiedCells.get(cell, UnitPawn.INVALID)
 
-func _getCellStatus(unit: Unit, cell: Vector2i) -> CellStatus:
+func _getCellStatus(unit: UnitPawn, cell: Vector2i) -> CellStatus:
 	if terrain.get_cell_source_id(cell) == -1:
 		return CellStatus.BLOCKED
 	if terrain.get_cell_atlas_coords(cell) == Vector2i(1, 0):
 		return CellStatus.BLOCKED
-	if unit == Unit.INVALID:
+	if unit == UnitPawn.INVALID:
 		return CellStatus.FREE
 	var occupator = getCellUnit(cell)
 	if occupator == null or occupator == unit:
@@ -110,10 +110,10 @@ func createDemoMap() -> void:
 	for cell in enemy_deploy_cells:
 		var unit = UnitManager.new(UnitManager.Team.ENEMY, Data.Monsters.GOBLIN, 0)
 		enemyTeam[unit.id] = unit
-		Unit.spawnAIUnit(unit, cell)
+		UnitPawn.spawnAIUnit(unit, cell)
 
 func deployPlayerTeam(units: Array[UnitManager]) -> void:
 	for unit in units:
 		var pos: Vector2i = Utils.chooseRandom(player_deploy_cells)
-		Unit.spawnPlayerUnit(unit, pos)
+		UnitPawn.spawnPlayerUnit(unit, pos)
 		player_deploy_cells.erase(pos)

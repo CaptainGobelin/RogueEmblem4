@@ -11,9 +11,9 @@ enum InputState {
 
 var battleScene : BattleScene
 var state : InputState = InputState.INPUT_LOCKED
-var selectedUnit : Unit = null
+var selectedUnit : UnitPawn = null
 
-func registerUnit(unit: Unit) -> void:
+func registerUnit(unit: UnitPawn) -> void:
 	unit.clicked.connect(_onUnitClicked)
 
 func registerMap(map: BattleMap) -> void:
@@ -41,7 +41,7 @@ func selectUnitMode() -> void:
 	selectedUnit = null
 	Ref.map.clearMask()
 
-func selectDestinationMode(unit : Unit) -> void:
+func selectDestinationMode(unit : UnitPawn) -> void:
 	selectedUnit = unit
 	state = InputState.INPUT_SELECT_DESTINATION
 
@@ -71,7 +71,7 @@ func _input(event: InputEvent) -> void:
 				chooseActionMode()
 				return
 
-func _onUnitClicked(unit : Unit) -> void:
+func _onUnitClicked(unit : UnitPawn) -> void:
 	match state:
 		InputState.INPUT_SELECT_UNIT:
 			battleScene.askSelectUnit(unit)

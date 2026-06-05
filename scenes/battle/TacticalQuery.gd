@@ -29,7 +29,7 @@ var wallsPerQuadrant: Dictionary = {}
 # Public
 # ==============================================================================
 
-func computeMoveMap(unit: Unit) -> Dictionary[Vector2i, TacticalQuery.Path]:
+func computeMoveMap(unit: UnitPawn) -> Dictionary[Vector2i, TacticalQuery.Path]:
 	var reach: Dictionary[Vector2i, Path] = {unit.pos: Path.new()}
 	var visited: Dictionary[Vector2i, Path] = {unit.pos: Path.new()}
 	var lastAdded: Array[Vector2i] = [unit.pos]
@@ -45,7 +45,7 @@ func computeMoveMap(unit: Unit) -> Dictionary[Vector2i, TacticalQuery.Path]:
 		lastAdded = newAdded
 	return reach
 
-func computeAttackMap(unit: Unit, reach: Array[Vector2i]) -> Dictionary[Vector2i, Vector2i]:
+func computeAttackMap(unit: UnitPawn, reach: Array[Vector2i]) -> Dictionary[Vector2i, Vector2i]:
 	var origin = unit.position
 	var allWalls: Array[Vector2i] = Ref.map.terrain.get_used_cells_by_id(0, Vector2i(1, 0))
 	wallsPerQuadrant = _computeWallsPerQuadrant(origin, unit.atkRange[1], allWalls)
@@ -68,8 +68,8 @@ func getNearbyArea(cell: Vector2i, areaRange: int) -> Array[Vector2i]:
 		var newAdded: Array[Vector2i] = []
 		for c in lastAdded:
 			for n in Data.neighbors:
-				if not visited.has(c + n) and get_parent().isCellPassable(Unit.INVALID, c + n):
-					if get_parent().isCellFree(Unit.INVALID, c + n):
+				if not visited.has(c + n) and get_parent().isCellPassable(UnitPawn.INVALID, c + n):
+					if get_parent().isCellFree(UnitPawn.INVALID, c + n):
 						reach.append(c + n)
 					visited.append(c + n)
 					newAdded.append(c + n)
@@ -121,7 +121,7 @@ func _computeWallsPerQuadrant(origin: Vector2i, r: int, walls: Array[Vector2i]) 
 		result[quadrant].append(w)
 	return result
 
-func _getAtkRing(unit: Unit) -> Array[Vector2i]:
+func _getAtkRing(unit: UnitPawn) -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
 	for r in range(unit.atkRange[0], unit.atkRange[1] + 1):
 		result.append_array(Data.cellRings[r])

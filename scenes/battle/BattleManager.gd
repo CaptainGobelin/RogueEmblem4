@@ -7,7 +7,7 @@ signal turnEnded(turn: Turn)
 
 var currentTurn: Turn = Turn.PLAYER
 
-func registerUnit(unit : Unit) -> void:
+func registerUnit(unit : UnitPawn) -> void:
 	turnStarted.connect(unit._onNewTurn)
 
 func startBattle() -> void:
@@ -27,10 +27,10 @@ func isBattleOver() -> void:
 	var playerAlive := false
 	var enemyAlive := false
 	for unit in Ref.units.get_children():
-		if unit.team == Unit.Team.PLAYER:
+		if unit.team == UnitPawn.Team.PLAYER:
 			if not unit.isDead:
 				playerAlive = true 
-		if unit.team == Unit.Team.ENEMY:
+		if unit.team == UnitPawn.Team.ENEMY:
 			if not unit.isDead:
 				enemyAlive = true
 	if not enemyAlive:

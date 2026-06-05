@@ -1,13 +1,13 @@
 extends Node2D
-class_name Unit
+class_name UnitPawn
 
 enum Team { PLAYER, ENEMY }
-signal clicked(unit: Unit)
+signal clicked(unit: UnitPawn)
 signal died
 signal acted
 
-static var unitScene = preload("res://scenes/battle/Unit.tscn")
-static var INVALID: Unit = null
+static var unitScene = preload("res://scenes/battle/UnitPawn.tscn")
+static var INVALID: UnitPawn = null
 
 @onready var button: Button = $Button
 
@@ -52,7 +52,7 @@ func _ready() -> void:
 func wait() -> void:
 	hasActed = true
 
-func attack(target: Unit) -> void:
+func attack(target: UnitPawn) -> void:
 	print(name + " attacks " + target.name)
 	target.takeDamage(attack_power)
 	hasActed = true
