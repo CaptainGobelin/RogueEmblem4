@@ -8,13 +8,13 @@ enum GameMode { BATTLE_DEMO }
 @export var mode: GameMode = GameMode.BATTLE_DEMO
 
 @onready var currentScene: Node = $CurrentScene
-var playerTeam: Dictionary = {}
+var playerTeam: Dictionary[int, UnitManager] = {}
 var inventory: Dictionary = {}
 
 func _ready():
 	match mode:
 		GameMode.BATTLE_DEMO:
-			startDemoBattle()
+			loadBattleScene()
 
 func startDemoBattle() -> void:
 	for i in range(3):
@@ -25,8 +25,10 @@ func loadBattleScene() -> void:
 	_clearScene()
 	var scene := battleScene.instantiate()
 	currentScene.add_child(scene)
-	scene.createDemoMap()
-	scene.deployPlayerTeam(playerTeam.values())
+	startDemoBattle()
+	Ref.map.createDemoMap()
+	Ref.map.deployPlayerTeam(playerTeam.values())
+	scene.initBattle()
 
 func _clearScene() -> void:
 	for c in currentScene.get_children():

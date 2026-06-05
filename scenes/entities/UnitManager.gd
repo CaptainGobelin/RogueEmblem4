@@ -33,8 +33,8 @@ func _init(unitTeam: Team, classID: int, level: int):
 			var favStat = Data.CLASS_DATA[unitType][Data.CL_FAV_STAT]
 			baseStats[favStat] += Data.GROWTH_AMOUNTS[favStat]
 		Team.ENEMY:
-			baseStats = Data.PROFILE_DATA[Data.MONSTER_DATA[unitType][Data.MO_PROFILE]][Data.PR_STATS].dupplicate()
-	currentHp = baseStats[Data.STATS.HP]
+			baseStats = Data.PROFILE_DATA[Data.MONSTER_DATA[unitType][Data.MO_PROFILE]][Data.PR_STATS].duplicate()
+	currentHp = baseStats[Data.Stats.HP]
 	if level > 0:
 		for l in range(level):
 			_levelUp()
