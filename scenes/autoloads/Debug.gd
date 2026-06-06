@@ -1,3 +1,3 @@
 extends Node
 
-const debugAi: bool = false
+const debugAi: bool = true

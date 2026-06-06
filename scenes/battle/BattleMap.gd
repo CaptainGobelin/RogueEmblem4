@@ -52,16 +52,16 @@ func getAttackableUnits(unit: UnitPawn, cell: Vector2i) -> Array[UnitPawn]:
 		var target: UnitPawn = Ref.map.getCellUnit(a)
 		if target == null or target == unit:
 			continue
-		if target.team == unit.team:
+		if target.entity.team == unit.entity.team:
 			continue
 		result.append(target)
 	return result
 
-func getNearbyUnits(cell: Vector2i, team: UnitPawn.Team, areaRange: int) -> Array[UnitPawn]:
+func getNearbyUnits(cell: Vector2i, team: UnitManager.Team, areaRange: int) -> Array[UnitPawn]:
 	var result: Array[UnitPawn] = []
 	for c in $TacticalQuery.getNearbyArea(cell, areaRange):
 		var unit = getCellUnit(c)
-		if unit != UnitPawn.INVALID and unit.team == team:
+		if unit != UnitPawn.INVALID and unit.entity.team == team:
 			result.append(unit)
 	return result
 
@@ -96,7 +96,7 @@ func _getCellStatus(unit: UnitPawn, cell: Vector2i) -> CellStatus:
 	var occupator = getCellUnit(cell)
 	if occupator == null or occupator == unit:
 		return CellStatus.FREE
-	if occupator.team != unit.team:
+	if occupator.entity.team != unit.entity.team:
 		return CellStatus.BLOCKED
 	return CellStatus.PASSABLE
 

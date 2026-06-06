@@ -27,11 +27,11 @@ func isBattleOver() -> void:
 	var playerAlive := false
 	var enemyAlive := false
 	for unit in Ref.units.get_children():
-		if unit.team == UnitPawn.Team.PLAYER:
-			if not unit.isDead:
+		if unit.entity.team == UnitManager.Team.PLAYER:
+			if not unit.entity.isDead:
 				playerAlive = true 
-		if unit.team == UnitPawn.Team.ENEMY:
-			if not unit.isDead:
+		if unit.entity.team == UnitManager.Team.ENEMY:
+			if not unit.entity.isDead:
 				enemyAlive = true
 	if not enemyAlive:
 		print("VICTORY")

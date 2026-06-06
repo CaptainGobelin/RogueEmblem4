@@ -2,7 +2,7 @@ extends Node
 class_name AIManager
 
 const HEATMAP_ALPHA = 0.55
-const ENEMY_POWER_RATIO = 3.0
+const ENEMY_POWER_RATIO = 5.0
 const ATK_FACTOR = 2.0
 const THREAT_RANGE = 5
 const SUPPORT_RANGE = 3
@@ -15,7 +15,7 @@ func performEnemyTurn() -> void:
 	var activated: Array[UnitPawn] = []
 	var threatCells: Dictionary = _computeThreatCells() # Vector2i -> [[Enemies], [Allies]]
 	for e in Ref.units.get_children():
-		if e.hasActed or e.team != UnitPawn.Team.ENEMY:
+		if e.hasActed or e.entity.team != UnitManager.Team.ENEMY:
 			continue
 		if _isThreatened(e, threatCells):
 			activated.append(e)
@@ -50,7 +50,7 @@ func performEnemyTurn() -> void:
 func _computeThreatCells() -> Dictionary:
 	var result: Dictionary = {}
 	for u in Ref.units.get_children():
-		if u.team == UnitPawn.Team.ENEMY:
+		if u.entity.team == UnitManager.Team.ENEMY:
 			continue
 		var threatCell = _getUnitThreat(u)
 		for c in threatCell:
@@ -73,7 +73,7 @@ func _getBestTarget(unit: UnitPawn, cell: Vector2i) -> UnitPawn:
 	return result
 
 func _activateNearbyAllies(unit: UnitPawn, activated: Array[UnitPawn]) -> void:
-	for a in Ref.map.getNearbyUnits(unit.pos, unit.team, SUPPORT_RANGE):
+	for a in Ref.map.getNearbyUnits(unit.pos, unit.entity.team, SUPPORT_RANGE):
 		if a.hasActed or activated.has(a):
 			continue
 		activated.append(a)
@@ -125,10 +125,10 @@ func _getUnitPressureScore(target: UnitPawn, attacker: UnitPawn) -> float:
 	return clamp(damages * ENEMY_POWER_RATIO, 0.4, 1.0)
 
 func _getExpectedDamage(attacker: UnitPawn, defender: UnitPawn) -> float:
-	var hitChance: float = float(attacker.aim - defender.def) / 100.0
+	var hitChance: float = float(attacker.entity.getAim() - defender.entity.getDef()) / 100.0
 	hitChance = clamp(hitChance, 0.10, 0.95)
-	var dmgProportion: float = float(attacker.strength) / float(defender.maxHp)
-	if attacker.speed >= 2 * defender.speed:
+	var dmgProportion: float = float(attacker.entity.getDamages()) / float(defender.entity.getMaxHP())
+	if attacker.entity.getSpd() >= 2 * defender.entity.getSpd():
 		dmgProportion *= 2
 	return hitChance * dmgProportion
 	

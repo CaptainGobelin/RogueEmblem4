@@ -33,7 +33,7 @@ func computeMoveMap(unit: UnitPawn) -> Dictionary[Vector2i, TacticalQuery.Path]:
 	var reach: Dictionary[Vector2i, Path] = {unit.pos: Path.new()}
 	var visited: Dictionary[Vector2i, Path] = {unit.pos: Path.new()}
 	var lastAdded: Array[Vector2i] = [unit.pos]
-	for i in range(unit.move):
+	for i in range(unit.entity.getMove()):
 		var newAdded: Array[Vector2i] = []
 		for c in lastAdded:
 			for n in Data.neighbors:
@@ -48,7 +48,7 @@ func computeMoveMap(unit: UnitPawn) -> Dictionary[Vector2i, TacticalQuery.Path]:
 func computeAttackMap(unit: UnitPawn, reach: Array[Vector2i]) -> Dictionary[Vector2i, Vector2i]:
 	var origin = unit.position
 	var allWalls: Array[Vector2i] = Ref.map.terrain.get_used_cells_by_id(0, Vector2i(1, 0))
-	wallsPerQuadrant = _computeWallsPerQuadrant(origin, unit.atkRange[1], allWalls)
+	wallsPerQuadrant = _computeWallsPerQuadrant(origin, unit.entity.getRange()[1], allWalls)
 	var attackMap: Dictionary[Vector2i, Vector2i] = {}
 	for r in reach:
 		for a in _getAtkRing(unit):
@@ -123,6 +123,6 @@ func _computeWallsPerQuadrant(origin: Vector2i, r: int, walls: Array[Vector2i]) 
 
 func _getAtkRing(unit: UnitPawn) -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
-	for r in range(unit.atkRange[0], unit.atkRange[1] + 1):
+	for r in range(unit.entity.getRange()[0], unit.entity.getRange()[1] + 1):
 		result.append_array(Data.cellRings[r])
 	return result

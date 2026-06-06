@@ -28,7 +28,7 @@ func askEnemyTurn() -> void:
 	battleManager.endTurn()
 
 func askSelectUnit(unit : UnitPawn) -> void:
-	if unit.team != UnitPawn.Team.PLAYER:
+	if unit.entity.team != UnitManager.Team.PLAYER:
 		return
 	if unit.hasActed:
 		return
@@ -46,7 +46,7 @@ func askApplyAction(unit: UnitPawn, action: Data.actions) -> void:
 func askAttack(attacker: UnitPawn, defender: UnitPawn, noMove: bool = false) -> void:
 	if not map.currentAttackMap.has(defender.pos):
 		return
-	if defender.team != UnitPawn.Team.ENEMY:
+	if defender.entity.team != UnitManager.Team.ENEMY:
 		return
 	if not noMove:
 		map.moveUnit(attacker, map.currentAttackMap[defender.pos])
@@ -66,7 +66,7 @@ func askWait(unit: UnitPawn) -> void:
 
 func checkEndPlayerTurn() -> void:
 	for unit in units.get_children():
-		if unit.team == UnitPawn.Team.PLAYER and not unit.hasActed:
+		if unit.entity.team == UnitManager.Team.PLAYER and not unit.hasActed:
 			return
 	battleManager.call_deferred("endTurn")
 

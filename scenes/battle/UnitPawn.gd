@@ -1,7 +1,6 @@
 extends Node2D
 class_name UnitPawn
 
-enum Team { PLAYER, ENEMY }
 signal clicked(unit: UnitPawn)
 signal died
 signal acted
@@ -11,38 +10,20 @@ static var INVALID: UnitPawn = null
 
 @onready var button: Button = $Button
 
-var team: Team = Team.PLAYER: 
-	set(value):
-		team = value
-		if team == Team.PLAYER:
-			$Body.frame = 0
-		else:
-			$Body.frame = 1
-
+var entity: UnitManager
 var previousPos: Vector2i
 var pos: Vector2i
-var maxHp: int = 10
-var attack_power: int = 3
-var aim: int = 80
-var def: int = 0
-var strength: int = 2
-var speed: int = 2
-var move: int = 4
-var atkRange: Vector2i = Vector2i(2, 2) # min, max
-var hp: int
-var isDead: bool = false
 var hasActed: bool = false:
 	set(value):
 		hasActed = value
 		if hasActed:
 			$Body.modulate = Color.WEB_GRAY
-			if team == Team.PLAYER:
+			if entity.team == UnitManager.Team.PLAYER:
 				acted.emit()
 		else:
 			$Body.modulate = Color.WHITE
 
 func _ready() -> void:
-	hp = maxHp
 	button.pressed.connect(_onPressed)
 
 # ==============================================================================
@@ -54,14 +35,14 @@ func wait() -> void:
 
 func attack(target: UnitPawn) -> void:
 	print(name + " attacks " + target.name)
-	target.takeDamage(attack_power)
+	target.takeDamage(entity.getDamages())
 	hasActed = true
 
 func takeDamage(amount: int) -> void:
-	hp -= amount
-	if hp <= 0:
-		isDead = true
-		print(name + " dies !")
+	entity.currentHp -= amount
+	if entity.currentHp <= 0:
+		entity.isDead = true
+		print(entity.unitName + " dies !")
 		Ref.map.occupiedCells.erase(pos)
 		died.emit()
 		get_parent().remove_child(self)
@@ -81,15 +62,15 @@ func moveTo(cell: Vector2i) -> void:
 # Statics
 # ==============================================================================
 
-static func spawnPlayerUnit(entity: UnitManager, cell: Vector2i) -> void:
+static func spawnPlayerUnit(e: UnitManager, cell: Vector2i) -> void:
 	var unit := unitScene.instantiate()
-	unit.team = Team.PLAYER
+	unit.entity = e
 	Ref.map.placeUnit(unit, cell)
 	Ref.units.add_child(unit)
 
-static func spawnAIUnit(entity: UnitManager, cell: Vector2i) -> void:
+static func spawnAIUnit(e: UnitManager, cell: Vector2i) -> void:
 	var unit := unitScene.instantiate()
-	unit.team = Team.ENEMY
+	unit.entity = e
 	Ref.map.placeUnit(unit, cell)
 	Ref.units.add_child(unit)
 
