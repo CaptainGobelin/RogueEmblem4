@@ -25,6 +25,7 @@ func performEnemyTurn() -> void:
 		var bestScore: float = 0.0
 		var bestUnit: UnitPawn = null
 		var bestCell: Vector2i = Vector2i(-1, -1)
+		var bestReach: Dictionary[Vector2i, TacticalQuery.Path] = {} 
 		for e in activated:
 			var reach = Ref.map.getUnitReach(e)
 			for c in reach:
@@ -33,11 +34,13 @@ func performEnemyTurn() -> void:
 					bestScore = score
 					bestUnit = e
 					bestCell = c
+					bestReach = reach
 			if Debug.debugAi:
 				await _drawDebug()
 		if bestScore <= 0:
 			return
 		_activateNearbyAllies(bestUnit, activated)
+		Ref.map.currentMoveMap = bestReach
 		await Ref.map.moveUnit(bestUnit, bestCell)
 		var target: UnitPawn = _getBestTarget(bestUnit, bestUnit.pos)
 		if target != null:
