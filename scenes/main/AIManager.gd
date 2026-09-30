@@ -34,7 +34,7 @@ func performEnemyTurn() -> void:
 					bestScore = score
 					bestUnit = e
 					bestCell = c
-					bestReach = reach
+					bestReach = reach.duplicate(true)
 			if Debug.debugAi:
 				await _drawDebug()
 		if bestScore <= 0:
